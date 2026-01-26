@@ -1,0 +1,48 @@
+
+> csv-dash@0.1.0 lint
+> eslint
+
+
+C:\Users\admin\wmdash\src\components\app-shell.tsx
+  19:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\admin\wmdash\src\components\filters-bar.tsx
+  18:10  warning  'ArrowsDownUp' is defined but never used  @typescript-eslint/no-unused-vars
+  23:10  warning  'Tag' is defined but never used           @typescript-eslint/no-unused-vars
+
+C:\Users\admin\wmdash\src\components\posts-table.tsx
+  28:10  warning  'Eye' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+  29:10  warning  'ChatText' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+  40:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\admin\wmdash\src\components\posts-table.tsx:40:9
+  38 |
+  39 |     useEffect(() => {
+> 40 |         setCurrentPage(1);
+     |         ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  41 |     }, [filteredPosts, itemsPerPage]);
+  42 |
+  43 |     const handleSort = (key: keyof Post) => {  react-hooks/set-state-in-effect
+  52:13  error    'sortableItems' is never reassigned. Use 'const' instead                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       prefer-const
+
+C:\Users\admin\wmdash\src\components\stat-cards.tsx
+  20:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  54:65  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  68:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\admin\wmdash\src\lib\csv-parser.ts
+  3:35  warning  'Language' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\admin\wmdash\src\lib\data-context.tsx
+  4:41  warning  'Network' is defined but never used   @typescript-eslint/no-unused-vars
+  4:50  warning  'PostType' is defined but never used  @typescript-eslint/no-unused-vars
+
+Γ£û 13 problems (5 errors, 8 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+
