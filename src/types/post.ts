@@ -22,6 +22,7 @@ export interface Filters {
   postTypes: PostType[];
   placements: string[];
   selectedMonths: string[];
+  selectedWeeks: string[];
   searchQuery: string;
   dateRange: { from: Date | undefined; to?: Date | undefined } | undefined;
 }

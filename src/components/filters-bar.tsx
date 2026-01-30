@@ -23,6 +23,7 @@ import { Tag } from '@phosphor-icons/react/dist/ssr/Tag';
 import { Calendar as CalendarIcon } from '@phosphor-icons/react/dist/ssr/Calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
+import { WeeklyFilter } from '@/components/weekly-filter';
 import dayjs from 'dayjs';
 
 const MONTHS = [
@@ -75,6 +76,7 @@ export const FiltersBar: React.FC = () => {
             postTypes: [],
             placements: [],
             selectedMonths: [],
+            selectedWeeks: [],
             searchQuery: '',
             dateRange: undefined,
         });
@@ -162,6 +164,9 @@ export const FiltersBar: React.FC = () => {
                     </DropdownMenuContent>
                 </DropdownMenu>
 
+                {/* Weekly Filter */}
+                <WeeklyFilter />
+
                 {/* Date Range Filter */}
                 <Popover>
                     <PopoverTrigger asChild>
@@ -204,7 +209,7 @@ export const FiltersBar: React.FC = () => {
                 <Button
                     variant="ghost"
                     size="sm"
-                    className="h-9 text-muted-foreground hover:text-destructive transition-colors"
+                    className="h-9 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
                     onClick={resetFilters}
                 >
                     <X className="w-4 h-4 mr-2" />

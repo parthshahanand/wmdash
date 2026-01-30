@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo } from '
 import { Post, Filters, DashboardStats } from '@/types/post';
 import type { Network, PostType } from '@/types/post';
 import { fetchAndParseData } from '@/lib/csv-parser';
+import { getWalmartWeeks, isDateInWeeks } from '@/lib/week-utils';
 import dayjs from 'dayjs';
 
 interface DataContextType {
@@ -28,6 +29,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         postTypes: [],
         placements: [],
         selectedMonths: [],
+        selectedWeeks: [],
         searchQuery: '',
         dateRange: undefined,
     });
@@ -43,6 +45,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setIsLoading(false);
             });
     }, []);
+
+    const allWeeks = useMemo(() => getWalmartWeeks(), []);
 
     const allPlacements = useMemo(() => {
         const placements = new Set<string>();
@@ -61,6 +65,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (filters.selectedMonths.length > 0) {
                 const postMonth = dayjs(post.publishedAt).format('MMMM');
                 if (!filters.selectedMonths.includes(postMonth)) return false;
+            }
+
+            if (filters.selectedWeeks.length > 0) {
+                if (!isDateInWeeks(post.publishedAt, filters.selectedWeeks, allWeeks)) return false;
             }
 
             if (filters.dateRange?.from) {
