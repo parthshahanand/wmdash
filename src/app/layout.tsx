@@ -1,16 +1,20 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "@fontsource-variable/inter";
 import "./globals.css";
 import { DataProvider } from "@/lib/data-context";
 import { AppShell } from "@/components/app-shell";
 import { ErrorBoundary } from "@/components/error-boundary";
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
   title: "Walmart Social Insights | 2025 Analytics Dashboard",
   description: "Enterprise-grade social media analytics dashboard for Walmart Canada, providing deep insights into organic performance across TikTok and Instagram.",
   keywords: ["Walmart", "Analytics", "Social Media", "Organic Performance", "Dashboard", "Marketing Insights"],
   authors: [{ name: "Walmart Canada" }],
-  viewport: "width=device-width, initial-scale=1",
   icons: {
     icon: '/favicon.ico',
   },
@@ -28,6 +32,7 @@ export const metadata: Metadata = {
     description: "Enterprise social media analytics dashboard for Walmart Canada",
   },
 };
+
 
 export default function RootLayout({
   children,

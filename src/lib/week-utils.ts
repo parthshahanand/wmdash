@@ -29,6 +29,7 @@ export const getWalmartWeeks = (year: number = 2025): Week[] => {
 
     while (currentStart.isBefore(endOfPeriod) && weekNum <= 52) {
         const currentEnd = currentStart.add(6, 'day').endOf('day');
+
         weeks.push({
             id: `Week ${weekNum}`,
             label: `Week ${weekNum}: ${currentStart.format('MMM D')} - ${currentEnd.format('MMM D')}`,

@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { Post, Filters, DashboardStats } from '@/types/post';
-import type { Network, PostType } from '@/types/post';
 import { fetchAndParseData } from '@/lib/csv-parser';
 import { getWalmartWeeks, isDateInWeeks } from '@/lib/week-utils';
 import dayjs from 'dayjs';
@@ -92,7 +91,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             return true;
         });
-    }, [posts, filters]);
+    }, [posts, filters, allWeeks]);
 
 
 

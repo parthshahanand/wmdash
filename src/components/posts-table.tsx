@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useData } from '@/lib/data-context';
 import { Post } from '@/types/post';
 import {
@@ -25,8 +25,6 @@ import { TiktokLogo } from '@phosphor-icons/react/dist/ssr/TiktokLogo';
 import { ArrowsDownUp } from '@phosphor-icons/react/dist/ssr/ArrowsDownUp';
 import { CaretLeft } from '@phosphor-icons/react/dist/ssr/CaretLeft';
 import { CaretRight } from '@phosphor-icons/react/dist/ssr/CaretRight';
-import { Eye } from '@phosphor-icons/react/dist/ssr/Eye';
-import { ChatText } from '@phosphor-icons/react/dist/ssr/ChatText';
 import { ArrowSquareOut } from '@phosphor-icons/react/dist/ssr/ArrowSquareOut';
 import dayjs from 'dayjs';
 
@@ -35,10 +33,14 @@ export const PostsTable: React.FC = () => {
     const [sortConfig, setSortConfig] = useState<{ key: keyof Post; direction: 'asc' | 'desc' } | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [prevFilteredPosts, setPrevFilteredPosts] = useState(filteredPosts);
+    const [prevItemsPerPage, setPrevItemsPerPage] = useState(itemsPerPage);
 
-    useEffect(() => {
+    if (filteredPosts !== prevFilteredPosts || itemsPerPage !== prevItemsPerPage) {
+        setPrevFilteredPosts(filteredPosts);
+        setPrevItemsPerPage(itemsPerPage);
         setCurrentPage(1);
-    }, [filteredPosts, itemsPerPage]);
+    }
 
     const handleSort = (key: keyof Post) => {
         let direction: 'asc' | 'desc' = 'asc';
@@ -49,7 +51,7 @@ export const PostsTable: React.FC = () => {
     };
 
     const sortedPosts = useMemo(() => {
-        let sortableItems = [...filteredPosts];
+        const sortableItems = [...filteredPosts];
         if (sortConfig !== null) {
             sortableItems.sort((a, b) => {
                 const aVal = a[sortConfig.key];

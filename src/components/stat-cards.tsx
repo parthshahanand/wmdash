@@ -5,10 +5,10 @@ import { useData } from '@/lib/data-context';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import CountUp from 'react-countup';
 import { FileText } from '@phosphor-icons/react/dist/ssr/FileText';
-import { ChartBar } from '@phosphor-icons/react/dist/ssr/ChartBar';
-import { CursorClick } from '@phosphor-icons/react/dist/ssr/CursorClick';
+import { Eye } from '@phosphor-icons/react/dist/ssr/Eye';
+import { ChatText } from '@phosphor-icons/react/dist/ssr/ChatText';
 import { Percent } from '@phosphor-icons/react/dist/ssr/Percent';
-import { Users } from '@phosphor-icons/react/dist/ssr/Users';
+import { UserPlus } from '@phosphor-icons/react/dist/ssr/UserPlus';
 import { FacebookLogo } from '@phosphor-icons/react/dist/ssr/FacebookLogo';
 import { InstagramLogo } from '@phosphor-icons/react/dist/ssr/InstagramLogo';
 import { TiktokLogo } from '@phosphor-icons/react/dist/ssr/TiktokLogo';
@@ -36,7 +36,7 @@ export const StatCards: React.FC = () => {
     }, []);
 
     const followerStats = useMemo(() => {
-        if (followerData.length === 0) return { value: 0, label: '...', icon: Users };
+        if (followerData.length === 0) return { value: 0, label: '...', icon: UserPlus };
 
         // Determine which month to show (most recent by default, or selected)
         let targetRow;
@@ -49,7 +49,7 @@ export const StatCards: React.FC = () => {
             targetRow = followerData[followerData.length - 1];
         }
 
-        if (!targetRow) return { value: 0, label: '...', icon: Users };
+        if (!targetRow) return { value: 0, label: '...', icon: UserPlus };
 
         const monthLabel = dayjs(targetRow.Date).format('MMMM YYYY');
 
@@ -69,7 +69,7 @@ export const StatCards: React.FC = () => {
         }
 
         // Determine icon
-        let icon = Users;
+        let icon = UserPlus;
         if (selectedNetworks.length === 1) {
             const net = selectedNetworks[0];
             if (net === 'FACEBOOK') icon = FacebookLogo;
@@ -101,7 +101,7 @@ export const StatCards: React.FC = () => {
         {
             title: 'Total Impressions',
             value: stats.totalImpressions,
-            icon: ChartBar,
+            icon: Eye,
             color: 'text-primary',
             bg: 'bg-primary/10',
             isPercentage: false,
@@ -109,7 +109,7 @@ export const StatCards: React.FC = () => {
         {
             title: 'Total Engagements',
             value: stats.totalEngagements,
-            icon: CursorClick,
+            icon: ChatText,
             color: 'text-primary',
             bg: 'bg-primary/10',
             isPercentage: false,

@@ -19,7 +19,6 @@ import { DeviceMobile } from '@phosphor-icons/react/dist/ssr/DeviceMobile';
 import { MapPin } from '@phosphor-icons/react/dist/ssr/MapPin';
 import { X } from '@phosphor-icons/react/dist/ssr/X';
 import { Globe } from '@phosphor-icons/react/dist/ssr/Globe';
-import { Tag } from '@phosphor-icons/react/dist/ssr/Tag';
 import { Calendar as CalendarIcon } from '@phosphor-icons/react/dist/ssr/Calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
@@ -28,7 +27,7 @@ import dayjs from 'dayjs';
 
 const MONTHS = [
     'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'July', 'August', 'September', 'October', 'November', 'December', 'January'
 ];
 
 export const FiltersBar: React.FC = () => {

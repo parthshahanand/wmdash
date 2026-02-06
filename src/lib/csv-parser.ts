@@ -1,6 +1,9 @@
 import Papa from 'papaparse';
 import dayjs from 'dayjs';
-import { Post, Network, PostType, Language, FollowerData } from '@/types/post';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { Post, Network, PostType, FollowerData } from '@/types/post';
+
+dayjs.extend(customParseFormat);
 
 interface RawCSVRow {
     'Post ID': string;
@@ -37,9 +40,13 @@ export const parseCSV = (csvString: string): Post[] => {
             return isNaN(parsed) ? 0 : parsed;
         };
 
-        // Date format is "MMM DD", we assume year 2025
+        // Date format is "MMM DD"
+        // Fiscal year: Feb 2025 – Jan 2026
         const dateStr = row['Published time (America/Toronto)'];
-        const publishedAt = dayjs(`${dateStr} 2025`, 'MMM DD YYYY').toDate();
+        const parsed = dayjs(dateStr, 'MMM DD');
+        const month = parsed.month(); // 0 = January
+        const year = month === 0 ? 2026 : 2025;
+        const publishedAt = parsed.year(year).toDate();
 
         return {
             id: row['Post ID'],
