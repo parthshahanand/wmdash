@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-export interface Week {
+interface Week {
     id: string; // "Week 1", "Week 2", etc.
     label: string; // "Week 1: Feb 1 - Feb 5"
     start: dayjs.Dayjs;

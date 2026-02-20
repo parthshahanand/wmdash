@@ -1,6 +1,6 @@
 export type Network = 'TIKTOK' | 'INSTAGRAM' | 'FACEBOOK';
 export type PostType = 'VIDEO' | 'IMAGE' | 'REELS' | 'CAROUSEL' | 'TEXT';
-export type Language = 'EN' | 'FR';
+
 
 export interface Post {
   id: string;

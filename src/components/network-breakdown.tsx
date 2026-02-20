@@ -5,7 +5,6 @@ import { useData } from '@/lib/data-context';
 import {
     PieChart,
     Pie,
-    Cell,
     ResponsiveContainer,
     Tooltip,
     Legend,
@@ -52,7 +51,11 @@ export const NetworkBreakdown: React.FC = () => {
             else if (metric === 'engagements') value = stats.engagements;
             else if (metric === 'engagementRate') value = stats.reach > 0 ? (stats.engagements * 100) / stats.reach : 0;
 
-            return { name, value };
+            return {
+                name,
+                value,
+                fill: NETWORK_COLORS[name as keyof typeof NETWORK_COLORS] || 'hsl(var(--muted))'
+            };
         }).filter(d => d.value > 0);
     }, [filteredPosts, metric]);
 
@@ -89,17 +92,10 @@ export const NetworkBreakdown: React.FC = () => {
                                 outerRadius={125}
                                 dataKey="value"
                                 animationDuration={1000}
-                            >
-                                {data.map((entry, index) => (
-                                    <Cell
-                                        key={`cell-${index}`}
-                                        fill={NETWORK_COLORS[entry.name as keyof typeof NETWORK_COLORS] || 'hsl(var(--muted))'}
-                                        stroke="hsl(var(--card))"
-                                        strokeWidth={12}
-                                        className="outline-none"
-                                    />
-                                ))}
-                            </Pie>
+                                stroke="hsl(var(--card))"
+                                strokeWidth={12}
+                                className="outline-none"
+                            />
                             <Tooltip
                                 contentStyle={{
                                     backgroundColor: 'hsl(var(--background))',
@@ -109,7 +105,7 @@ export const NetworkBreakdown: React.FC = () => {
                                     fontWeight: '600',
                                     boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'
                                 }}
-                                formatter={(value: number) => isPercentage ? `${value.toFixed(2)}%` : value.toLocaleString()}
+                                formatter={((value: number) => isPercentage ? `${value.toFixed(2)}%` : value.toLocaleString()) as never}
                             />
                             <Legend
                                 iconType="circle"

@@ -21,49 +21,6 @@ interface RawCSVRow {
     [key: string]: string;
 }
 
-export const parseCSV = (csvString: string): Post[] => {
-    const result = Papa.parse(csvString, {
-        header: true,
-        skipEmptyLines: true,
-    });
-
-    return (result.data as RawCSVRow[]).map((row) => {
-        const parsePercentage = (val: string): number => {
-            if (!val) return 0;
-            const parsed = parseFloat(val.replace('%', ''));
-            return isNaN(parsed) ? 0 : parsed / 100;
-        };
-
-        const parseNumber = (val: string): number => {
-            if (!val || val === '-' || val === '') return 0;
-            const parsed = parseInt(val.replace(/,/g, ''));
-            return isNaN(parsed) ? 0 : parsed;
-        };
-
-        // Date format is "MMM DD"
-        // Fiscal year: Feb 2025 – Jan 2026
-        const dateStr = row['Published time (America/Toronto)'];
-        const parsed = dayjs(dateStr, 'MMM DD');
-        const month = parsed.month(); // 0 = January
-        const year = month === 0 ? 2026 : 2025;
-        const publishedAt = parsed.year(year).toDate();
-
-        return {
-            id: row['Post ID'],
-            network: row['Network'] as Network,
-            publishedAt,
-            postType: row['Post Type'] as PostType,
-            placement: row['Placement'],
-            boosted: row['Boosted'] === 'Yes',
-            text: row['Post text'] || '',
-            url: row['Post URL'] || '',
-            impressions: parseNumber(row['Impressions']),
-            reach: row['Reach'] === '-' ? null : parseNumber(row['Reach']),
-            engagementRate: parsePercentage(row['Engagement rate']),
-            engagements: parseNumber(row['Engagements']),
-        };
-    });
-};
 
 export const fetchAndParseData = async (): Promise<Post[]> => {
     try {
@@ -72,7 +29,47 @@ export const fetchAndParseData = async (): Promise<Post[]> => {
             throw new Error(`Failed to fetch CSV: ${response.statusText}`);
         }
         const csvString = await response.text();
-        return parseCSV(csvString);
+        const result = Papa.parse(csvString, {
+            header: true,
+            skipEmptyLines: true,
+        });
+
+        return (result.data as RawCSVRow[]).map((row) => {
+            const parsePercentage = (val: string): number => {
+                if (!val) return 0;
+                const parsed = parseFloat(val.replace('%', ''));
+                return isNaN(parsed) ? 0 : parsed / 100;
+            };
+
+            const parseNumber = (val: string): number => {
+                if (!val || val === '-' || val === '') return 0;
+                const parsed = parseInt(val.replace(/,/g, ''));
+                return isNaN(parsed) ? 0 : parsed;
+            };
+
+            // Date format is "MMM DD"
+            // Fiscal year: Feb 2025 – Jan 2026
+            const dateStr = row['Published time (America/Toronto)'];
+            const parsed = dayjs(dateStr, 'MMM DD');
+            const month = parsed.month(); // 0 = January
+            const year = month === 0 ? 2026 : 2025;
+            const publishedAt = parsed.year(year).toDate();
+
+            return {
+                id: row['Post ID'],
+                network: row['Network'] as Network,
+                publishedAt,
+                postType: row['Post Type'] as PostType,
+                placement: row['Placement'],
+                boosted: row['Boosted'] === 'Yes',
+                text: row['Post text'] || '',
+                url: row['Post URL'] || '',
+                impressions: parseNumber(row['Impressions']),
+                reach: row['Reach'] === '-' ? null : parseNumber(row['Reach']),
+                engagementRate: parsePercentage(row['Engagement rate']),
+                engagements: parseNumber(row['Engagements']),
+            };
+        });
     } catch (error) {
         console.error('Error fetching/parsing CSV data:', error);
         throw error;

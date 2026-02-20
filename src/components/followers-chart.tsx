@@ -76,8 +76,8 @@ export const FollowersChart: React.FC = () => {
                             variant={selectedPlatform === p ? 'secondary' : 'ghost'}
                             size="sm"
                             className={`h-7 px-3 text-[10px] font-bold uppercase tracking-wider transition-all ${selectedPlatform === p
-                                    ? 'bg-background shadow-sm border border-border/50'
-                                    : 'text-muted-foreground'
+                                ? 'bg-background shadow-sm border border-border/50'
+                                : 'text-muted-foreground'
                                 }`}
                             onClick={() => setSelectedPlatform(p)}
                         >
@@ -120,7 +120,7 @@ export const FollowersChart: React.FC = () => {
                                 fontWeight: '600',
                                 boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'
                             }}
-                            formatter={(value: number) => [value.toLocaleString(), selectedPlatform.charAt(0).toUpperCase() + selectedPlatform.slice(1)]}
+                            formatter={((value: number) => [value.toLocaleString(), selectedPlatform.charAt(0).toUpperCase() + selectedPlatform.slice(1)]) as never}
                         />
                         <Line
                             type="monotone"
