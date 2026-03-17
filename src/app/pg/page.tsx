@@ -18,9 +18,12 @@ import { SentimentChartPopover } from "@/components/pg/sentiment-chart-popover";
 import { ErChartPopover } from "@/components/pg/er-chart-popover";
 import { FollowersChartPopover } from "@/components/pg/followers-chart-popover";
 import { ImpressionsChartPopover } from "@/components/pg/impressions-chart-popover";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { TableData } from "@/types/pg-types";
 
 function ProgressGridContent() {
-    const { tables, isLoading, error } = usePGData();
+    const { tables, isLoading, error, activeYear, setActiveYear } = usePGData();
     const [activePopoverIndex, setActivePopoverIndex] = useState<number | null>(null);
 
     const getIconForTable = (title: string) => {
@@ -48,6 +51,19 @@ function ProgressGridContent() {
     if (isLoading) {
         return (
             <div className="space-y-12">
+                <div className="flex gap-2 mb-8">
+                    {['FY26', 'FY27'].map((year) => (
+                        <Button
+                            key={year}
+                            variant={activeYear === year ? 'default' : 'outline'}
+                            size="sm"
+                            className="h-8 px-6 rounded-full text-[12px] font-black tracking-widest transition-all"
+                            onClick={() => setActiveYear(year)}
+                        >
+                            {year}
+                        </Button>
+                    ))}
+                </div>
                 {[1, 2, 3].map((i) => (
                     <div key={i} className="space-y-4">
                         <Skeleton className="h-6 w-48 ml-1" />
@@ -60,7 +76,25 @@ function ProgressGridContent() {
 
     return (
         <div className="flex flex-col gap-12 w-full mx-auto pb-20">
-            {tables.map((table, index) => (
+            <div className="flex gap-2 -mt-4 mb-2">
+                {['FY26', 'FY27'].map((year) => (
+                    <Button
+                        key={year}
+                        variant={activeYear === year ? 'default' : 'outline'}
+                        size="sm"
+                        className={cn(
+                            "h-8 px-6 rounded-full text-[12px] font-black tracking-widest transition-all",
+                            activeYear === year
+                                ? 'bg-secondary text-secondary-foreground border-secondary shadow-md shadow-secondary/20 scale-105'
+                                : 'text-muted-foreground hover:border-secondary/50'
+                        )}
+                        onClick={() => setActiveYear(year)}
+                    >
+                        {year}
+                    </Button>
+                ))}
+            </div>
+            {tables.map((table: TableData, index: number) => (
                 <section
                     key={index}
                     id={table.title.toLowerCase().replace(/\s+/g, '-')}
@@ -78,32 +112,32 @@ function ProgressGridContent() {
                             table.title.toLowerCase().includes('community management')
                                 ? <CmChartPopover
                                     data={table}
-                                    onOpenChange={(open) => setActivePopoverIndex(open ? index : null)}
+                                    onOpenChange={(open: boolean) => setActivePopoverIndex(open ? index : null)}
                                 />
                                 : table.title.toLowerCase().includes('opt-in')
                                     ? <OptInChartPopover
                                         data={table}
-                                        onOpenChange={(open) => setActivePopoverIndex(open ? index : null)}
+                                        onOpenChange={(open: boolean) => setActivePopoverIndex(open ? index : null)}
                                     />
                                     : table.title.toLowerCase().includes('sentiment')
                                         ? <SentimentChartPopover
                                             data={table}
-                                            onOpenChange={(open) => setActivePopoverIndex(open ? index : null)}
+                                            onOpenChange={(open: boolean) => setActivePopoverIndex(open ? index : null)}
                                         />
                                         : table.title.toLowerCase().includes('engagement rate')
                                             ? <ErChartPopover
                                                 data={table}
-                                                onOpenChange={(open) => setActivePopoverIndex(open ? index : null)}
+                                                onOpenChange={(open: boolean) => setActivePopoverIndex(open ? index : null)}
                                             />
                                             : table.title.toLowerCase().includes('followers')
                                                 ? <FollowersChartPopover
                                                     data={table}
-                                                    onOpenChange={(open) => setActivePopoverIndex(open ? index : null)}
+                                                    onOpenChange={(open: boolean) => setActivePopoverIndex(open ? index : null)}
                                                 />
                                                 : table.title.toLowerCase().includes('impressions')
                                                     ? <ImpressionsChartPopover
                                                         data={table}
-                                                        onOpenChange={(open) => setActivePopoverIndex(open ? index : null)}
+                                                        onOpenChange={(open: boolean) => setActivePopoverIndex(open ? index : null)}
                                                     />
                                                     : undefined
                         }

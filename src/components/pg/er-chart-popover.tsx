@@ -28,8 +28,10 @@ import {
     GRID_PROPS,
     LEGEND_STYLE,
     TOOLTIP_STYLE,
-    formatPct
+    formatPct,
+    formatKM
 } from "@/lib/pg/chart-constants";
+import { useData as usePGData } from "@/lib/pg/data-context";
 
 interface ErChartPopoverProps {
     data: TableData;
@@ -46,19 +48,33 @@ function parseErCell(cell: string | undefined): { organic: number | null; booste
 }
 
 export const ErChartPopover: React.FC<ErChartPopoverProps> = ({ data, onOpenChange }) => {
+    const { activeYear } = usePGData();
+    const isFY27 = activeYear === 'FY27';
+
     const [view, setView] = useState<'organic' | 'paid'>('organic');
     const [showInstagram, setShowInstagram] = useState(false);
     const [showTikTok, setShowTikTok] = useState(false);
     const [showSparkSquad, setShowSparkSquad] = useState(false);
+    const [sparkTab, setSparkTab] = useState<'meta' | 'tiktok' | 'engagements'>('engagements');
 
     // Identify rows
     const organicPlanRow = data.rows.find(r => r[0] === 'Organic ER Plan');
     const organicActualRow = data.rows.find(r => r[0] === 'Organic ER Actual');
     const igRow = data.rows.find(r => r[0] === 'Instagram Actual');
     const tiktokRow = data.rows.find(r => r[0] === 'TikTok Actual');
+    
+    // FY26 specific
     const sparkSquadRow = data.rows.find(r => r[0].includes('Spark Squad'));
-    const paidPlanRow = data.rows.find(r => r[0].includes('Paid/Boosted ER Plan'));
-    const paidActualRow = data.rows.find(r => r[0].includes('Paid/Boosted ER Actual'));
+    const paidPlanRowLegacy = data.rows.find(r => r[0].includes('Paid/Boosted ER Plan'));
+    const paidActualRowLegacy = data.rows.find(r => r[0].includes('Paid/Boosted ER Actual'));
+
+    // FY27 specific Spark
+    const sparkMetaPlanRow = data.rows.find(r => r[0].includes('Organic ER Spark Meta') && r[0].includes('Plan'));
+    const sparkMetaActualRow = data.rows.find(r => r[0].includes('Organic ER Spark Meta') && r[0].includes('Actual'));
+    const sparkTTPlanRow = data.rows.find(r => r[0].includes('Organic ER Spark TikTok') && r[0].includes('Plan'));
+    const sparkTTActualRow = data.rows.find(r => r[0].includes('Organic ER Spark TikTok') && r[0].includes('Actual'));
+    const sparkEngPlanRow = data.rows.find(r => r[0].includes('Organic Engagements Spark') && r[0].includes('Plan'));
+    const sparkEngActualRow = data.rows.find(r => r[0].includes('Organic Engagements Spark') && r[0].includes('Actual'));
 
     const headers = data.headers;
 
@@ -81,14 +97,38 @@ export const ErChartPopover: React.FC<ErChartPopoverProps> = ({ data, onOpenChan
 
     const paidChartData = headers.slice(2, 14).map((header, i) => {
         const col = i + 2;
+        
+        if (isFY27) {
+            let planRow, actualRow;
+            if (sparkTab === 'meta') {
+                planRow = sparkMetaPlanRow;
+                actualRow = sparkMetaActualRow;
+            } else if (sparkTab === 'tiktok') {
+                planRow = sparkTTPlanRow;
+                actualRow = sparkTTActualRow;
+            } else {
+                planRow = sparkEngPlanRow;
+                actualRow = sparkEngActualRow;
+            }
+
+            return {
+                month: header,
+                plan: parseMetricValue(planRow?.[col]),
+                actual: parseMetricValue(actualRow?.[col]),
+            };
+        }
+
+        // Legacy FY26
         const monthIndex = i;
-        const planVal = monthIndex >= 3 ? 1.35 : parseMetricValue(paidPlanRow?.[col]?.split('\n')[0]);
+        const planVal = monthIndex >= 3 ? 1.35 : parseMetricValue(paidPlanRowLegacy?.[col]?.split('\n')[0]);
         return {
             month: header,
             plan: planVal,
-            actual: parseMetricValue(paidActualRow?.[col]),
+            actual: parseMetricValue(paidActualRowLegacy?.[col]),
         };
     });
+
+    const isEngView = isFY27 && view === 'paid' && sparkTab === 'engagements';
 
     const extraHeaderAction = (
         <Select value={view} onValueChange={(v) => setView(v as 'organic' | 'paid')}>
@@ -96,8 +136,12 @@ export const ErChartPopover: React.FC<ErChartPopoverProps> = ({ data, onOpenChan
                 <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-white border-slate-200">
-                <SelectItem value="organic" className="text-[11px] font-semibold uppercase tracking-wider">Organic</SelectItem>
-                <SelectItem value="paid" className="text-[11px] font-semibold uppercase tracking-wider">Paid</SelectItem>
+                <SelectItem value="organic" className="text-[11px] font-semibold uppercase tracking-wider">
+                    {isFY27 ? 'Owned' : 'Organic'}
+                </SelectItem>
+                <SelectItem value="paid" className="text-[11px] font-semibold uppercase tracking-wider">
+                    {isFY27 ? 'Spark' : 'Paid'}
+                </SelectItem>
             </SelectContent>
         </Select>
     );
@@ -112,7 +156,7 @@ export const ErChartPopover: React.FC<ErChartPopoverProps> = ({ data, onOpenChan
             <div className="flex flex-col h-full gap-4">
                 {view === 'organic' && (
                     <div className="flex gap-6 px-1">
-                        <label className="flex items-center gap-2 text-[11px] font-bold text-slate-600 cursor-pointer select-none">
+                        <label className="flex items-center gap-2 text-[11px] font-bold text-slate-600 cursor-pointer select-none text-nowrap">
                             <input
                                 type="checkbox"
                                 checked={showInstagram}
@@ -121,7 +165,7 @@ export const ErChartPopover: React.FC<ErChartPopoverProps> = ({ data, onOpenChan
                             />
                             SHOW INSTAGRAM
                         </label>
-                        <label className="flex items-center gap-2 text-[11px] font-bold text-slate-600 cursor-pointer select-none">
+                        <label className="flex items-center gap-2 text-[11px] font-bold text-slate-600 cursor-pointer select-none text-nowrap">
                             <input
                                 type="checkbox"
                                 checked={showTikTok}
@@ -130,15 +174,34 @@ export const ErChartPopover: React.FC<ErChartPopoverProps> = ({ data, onOpenChan
                             />
                             SHOW TIKTOK
                         </label>
-                        <label className="flex items-center gap-2 text-[11px] font-bold text-slate-600 cursor-pointer select-none">
-                            <input
-                                type="checkbox"
-                                checked={showSparkSquad}
-                                onChange={(e) => setShowSparkSquad(e.target.checked)}
-                                className="w-3.5 h-3.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-                            />
-                            SHOW SPARK SQUAD
-                        </label>
+                        {!isFY27 && (
+                            <label className="flex items-center gap-2 text-[11px] font-bold text-slate-600 cursor-pointer select-none text-nowrap">
+                                <input
+                                    type="checkbox"
+                                    checked={showSparkSquad}
+                                    onChange={(e) => setShowSparkSquad(e.target.checked)}
+                                    className="w-3.5 h-3.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                />
+                                SHOW SPARK SQUAD
+                            </label>
+                        )}
+                    </div>
+                )}
+
+                {isFY27 && view === 'paid' && (
+                    <div className="flex gap-6 px-1">
+                         {(['engagements', 'meta', 'tiktok'] as const).map((tab) => (
+                            <label key={tab} className="flex items-center gap-2 text-[11px] font-bold text-slate-600 cursor-pointer select-none uppercase text-nowrap">
+                                <input
+                                    type="radio"
+                                    name="sparkTab"
+                                    checked={sparkTab === tab}
+                                    onChange={() => setSparkTab(tab)}
+                                    className="w-3.5 h-3.5 border-slate-300 text-secondary focus:ring-secondary"
+                                />
+                                {tab}
+                            </label>
+                        ))}
                     </div>
                 )}
 
@@ -147,11 +210,14 @@ export const ErChartPopover: React.FC<ErChartPopoverProps> = ({ data, onOpenChan
                         <LineChart data={view === 'organic' ? organicChartData : paidChartData} margin={CHART_MARGIN}>
                             <CartesianGrid {...GRID_PROPS} />
                             <XAxis dataKey="month" {...AXIS_PROPS} dy={10} />
-                            <YAxis {...AXIS_PROPS} tickFormatter={formatPct} />
+                            <YAxis 
+                                {...AXIS_PROPS} 
+                                tickFormatter={isEngView ? formatKM : formatPct} 
+                            />
                             <Tooltip
                                 {...TOOLTIP_STYLE}
                                 separator=""
-                                formatter={((value: number) => [formatPct(value), ""]) as never}
+                                formatter={((value: number) => [isEngView ? formatKM(value) : formatPct(value), ""]) as never}
                             />
                             <Legend {...LEGEND_STYLE} />
                             <Line
@@ -217,7 +283,7 @@ export const ErChartPopover: React.FC<ErChartPopoverProps> = ({ data, onOpenChan
                                 </>
                             )}
 
-                            {view === 'organic' && showSparkSquad && (
+                            {view === 'organic' && showSparkSquad && !isFY27 && (
                                 <Line
                                     name="Spark Squad"
                                     type="monotone"
@@ -234,3 +300,4 @@ export const ErChartPopover: React.FC<ErChartPopoverProps> = ({ data, onOpenChan
         </ChartPopoverShell>
     );
 };
+
